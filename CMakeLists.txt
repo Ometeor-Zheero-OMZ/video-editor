@@ -8,6 +8,12 @@ pkg_check_modules(AV REQUIRED libavcodec libavformat libavutil libswscale libavf
 
 include_directories(${AV_INCLUDE_DIRS})
 link_directories(${AV_LIBRARY_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-add_executable(video_codec main.cpp)
+set(SOURCES
+    src/main.cpp
+    src/media/media_file.cpp
+)
+
+add_executable(video_codec ${SOURCES})
 target_link_libraries(video_codec ${AV_LIBRARIES})

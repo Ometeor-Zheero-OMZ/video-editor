@@ -42,13 +42,13 @@ make
 ## Usage
 
 ```sh
-./video_codecs <input_file>
+./video_codec <input_file>
 ```
 
 Example:
 
 ```sh
-./video_codecs video.mp4
+./video_codec video.mp4
 ```
 
 ## Future Development
