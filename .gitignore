@@ -1,0 +1,28 @@
+# CMake build directories
+/build/
+/build-*/ 
+/out/
+/bin/
+/lib/
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+
+# Visual Studio Code settings
+/.vscode/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Video outputs
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+
+# Docs
+docs/
