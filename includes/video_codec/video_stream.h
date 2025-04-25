@@ -28,7 +28,7 @@ namespace video_codec
 
         // Can move
         VideoStream(VideoStream &&) noexcept;
-        VideoStream &operator=(const VideoStream &) = delete;
+        VideoStream &operator=(VideoStream &&) noexcept;
 
         // Initialize Stream
         bool initialize(AVFormatContext *format_ctx, int stream_index);
