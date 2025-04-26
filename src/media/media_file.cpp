@@ -83,6 +83,64 @@ namespace video_codec
         stream_info_.clear();
     }
 
+    int MediaFile::findVideoStreamIndex(int index) const
+    {
+        if (!format_ctx_)
+            return -1;
+
+        if (index >= 0)
+        {
+            // Check if the specified index is valid and corresponds to a video stream
+            if (static_cast<unsigned int>(index) < format_ctx_->nb_streams &&
+                format_ctx_->streams[index]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+            {
+                return index;
+            }
+            return -1;
+        }
+
+        // Retrieve a first index of video stream
+        for (unsigned int i = 0; i < format_ctx_->nb_streams; i++)
+        {
+            if (format_ctx_->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    VideoStream MediaFile::getVideoStream(int index)
+    {
+        VideoStream stream;
+
+        int video_index = findVideoStreamIndex(index);
+        if (video_index < 0)
+        {
+            std::cerr << "No video stream found" << std::endl;
+            return stream;
+        }
+
+        if (!stream.initialize(format_ctx_, video_index))
+        {
+            std::cerr << "Failed to initialize video stream" << std::endl;
+        }
+
+        return stream;
+    }
+
+    bool MediaFile::processVideoFrames(FrameProcessor &processor, int max_frames, int video_stream_index)
+    {
+        VideoStream stream = getVideoStream(video_stream_index);
+        if (!stream.getCodecContext())
+        {
+            return false;
+        }
+
+        return stream.processFrames(processor, max_frames);
+    }
+
     // clang-format off
     int64_t MediaFile::getDuration() const
     {
