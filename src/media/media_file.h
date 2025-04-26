@@ -7,6 +7,7 @@ extern "C"
 #include <libavutil/avutil.h>
 }
 
+#include <media/video_stream.h>
 #include <string>
 #include <memory>
 #include <vector>
@@ -45,6 +46,10 @@ namespace video_codec
         MediaFile(MediaFile &&) noexcept;
         MediaFile &operator=(MediaFile &&) noexcept;
 
+        // Fetch video stream
+        VideoStream getVideoStream(int index = -1);
+        bool processVideoFrames(FrameProcessor &processor, int max_frames = -1, int video_stream_index = -1);
+
         bool open(const std::string &filename);
         void close();
 
@@ -68,6 +73,9 @@ namespace video_codec
         std::string format_long_name_;
         AVFormatContext *format_ctx_{nullptr};
         std::vector<StreamInfo> stream_info_;
+
+        // Retrieve an index of video stream
+        int findVideoStreamIndex(int index = -1) const;
 
         void analyzeStreams();
     };
