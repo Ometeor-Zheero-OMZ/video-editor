@@ -51,6 +51,14 @@ Example:
 ./video_codec video.mp4
 ```
 
+or
+
+./vide_codec <video_file> <output_file> <max_frame>
+
+```sh
+./video_codec video.mp4 ./output 100
+```
+
 ## Future Development
 
 This project serves as a foundation for concepts that will be further developed in a more extensive Rust-based implementation. However, this C++ version is not a trivial demonstration - it implements substantial video processing capabilities and can be used as a functional command-line video processing tool.
