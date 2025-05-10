@@ -1,6 +1,7 @@
 #include <media/media_file.h>
 #include <processing/frame_processor.h>
 #include <processing/simple_frame_processor.h>
+#include <processing/video_writer_processor.h>
 #include <iostream>
 #include <string>
 #include <memory>
@@ -36,6 +37,7 @@ int main(int argc, char *argv[])
     std::cout << "2. Save frames as JPG images" << std::endl;
     std::cout << "3. Convert to grayscale and save frames" << std::endl;
     std::cout << "4. Adjust brightness/contrast and save frames" << std::endl;
+    std::cout << "5. Create MP4 video output" << std::endl;
     std::cout << "Option: ";
 
     int option;
@@ -104,6 +106,96 @@ int main(int argc, char *argv[])
         result = media_file.processVideoFrames(processor, max_frames);
         break;
     }
+    case 5:
+    {
+        std::string raw_filename;
+        std::cout << "Enter output video filename (e.g., output.mp4): ";
+        std::cin >> raw_filename;
+
+        std::string output_directory = "output_videos";
+        if (!std::filesystem::exists(output_directory))
+            std::filesystem::create_directories(output_directory);
+
+        std::string output_filename = output_directory + "/" + raw_filename;
+
+        double fps;
+        std::cout << "Enter output FPS (default 30): ";
+        std::cin >> fps;
+        if (fps <= 0)
+            fps = 30.0;
+
+        // Get video stream information for resolution
+        video_codec::VideoStream stream = media_file.getVideoStream();
+        if (!stream.getCodecContext())
+        {
+            std::cerr << "Failed to get video strema information" << std::endl;
+            return 1;
+        }
+
+        int width = stream.getWidth();
+        int height = stream.getHeight();
+
+        std::cout << "Creating video output: " << output_filename << std::endl;
+        std::cout << "Resolution: " << width << "x" << height << std::endl;
+        std::cout << "FPS: " << fps << std::endl;
+
+        // Option for filters before saving
+        std::cout << "\nApply filters?" << std::endl;
+        std::cout << "1. No filters" << std::endl;
+        std::cout << "2. Grayscale filter" << std::endl;
+        std::cout << "3. Brightness/contrast adjustment" << std::endl;
+        std::cout << "Option: ";
+
+        int filter_option;
+        std::cin >> filter_option;
+
+        std::unique_ptr<video_codec::VideoWriterProcessor> video_writer;
+        video_writer = std::make_unique<video_codec::VideoWriterProcessor>(
+            output_filename, width, height, fps);
+
+        switch (filter_option)
+        {
+        case 1:
+            // No filters
+            result = media_file.processVideoFrames(*video_writer, max_frames);
+            break;
+
+        case 2:
+            // Grayscale
+            {
+                auto grayscale = std::make_unique<video_codec::GrayscaleProcessor>(video_writer.get());
+                result = media_file.processVideoFrames(*grayscale, max_frames);
+                break;
+            }
+
+        case 3:
+            // Brightness/contrast adjustment
+            {
+                double brightness, contrast;
+                std::cout << "Enter brightness adjustment (-1.0 to 1.0): ";
+                std::cin >> brightness;
+                std::cout << "Enter contrast adjustment (0.0 to 3.0, 1.0 is normal): ";
+                std::cin >> contrast;
+
+                auto brightness_contrast = std::make_unique<video_codec::BrightnessContrastProcessor>(
+                    brightness, contrast, video_writer.get());
+                result = media_file.processVideoFrames(*brightness_contrast, max_frames);
+                break;
+            }
+
+        default:
+            std::cerr << "Invalid option" << std::endl;
+            return 1;
+        }
+
+        // Finalize video output
+        if (result && !video_writer->finalize())
+        {
+            std::cerr << "Failed to finalize video output" << std::endl;
+            result = false;
+        }
+        break;
+    }
     default:
         std::cerr << "Invalid option" << std::endl;
         return 1;
@@ -111,12 +203,10 @@ int main(int argc, char *argv[])
 
     if (!result)
     {
-        std::cerr << "Frame processing faield" << std::endl;
+        std::cerr << "Frame processing failed" << std::endl;
         return 1;
     }
 
     std::cout << "Processing completed successfully" << std::endl;
-    return 0;
-
     return 0;
 }
