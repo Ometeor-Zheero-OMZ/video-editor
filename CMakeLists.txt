@@ -17,7 +17,9 @@ set(SOURCES
     src/main.cpp
     src/media/media_file.cpp
     src/media/video_stream.cpp
+    src/media/video_writer.cpp
     src/processing/simple_frame_processor.cpp
+    src/processing/video_writer_processor.cpp
 )
 
 add_executable(video_codec ${SOURCES})
