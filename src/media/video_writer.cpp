@@ -163,7 +163,7 @@ namespace video_codec
         ret = avcodec_parameters_from_context(video_stream_->codecpar, codec_ctx_);
         if (ret < 0)
         {
-            setError("Could not copy strream parameters", ret);
+            setError("Could not copy stream parameters", ret);
             return false;
         }
 
@@ -297,7 +297,7 @@ namespace video_codec
         int ret = avcodec_send_frame(codec_ctx_, nullptr);
         if (ret < 0)
         {
-            setError("Error flusing encoder", ret);
+            setError("Error flushing encoder", ret);
             return false;
         }
 
