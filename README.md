@@ -69,6 +69,6 @@ MIT License
 
 ## Author
 
-Ometeor-Zherro-OMZ
+itsakeyfut
 
 Feel free to modify any sections to better match your project goals or to add more specific details about functionality as you implement more features. You can also add sections about contribution guidelines, known limitations, or acknowledgments if relevant to your project.
